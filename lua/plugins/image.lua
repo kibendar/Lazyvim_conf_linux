@@ -1,7 +1,7 @@
 return {
   {
     "3rd/image.nvim",
-    backend = "ghostty", -- Terminal backend (kitty/ueberzug/chafa)
+    backend = "kitty", -- Terminal backend (kitty/ueberzug/chafa)
     processor = "magick_rock", -- Image processor
     integrations = {
       markdown = {

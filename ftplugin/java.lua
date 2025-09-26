@@ -1,4 +1,4 @@
-local home = os.getenv "HOME"
+local home = os.getenv("HOME")
 local jdtls_path = home .. "/.local/share/nvim/mason/packages/jdtls"
 local lombok_path = jdtls_path .. "/lombok.jar"
 local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
@@ -46,7 +46,7 @@ local config = {
   },
   -- This is the default if not provided, you can remove it. Or adjust as needed.
   -- One dedicated LSP server & client will be started per unique root_dir
-  root_dir = require("jdtls.setup").find_root { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" },
+  root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" }),
   settings = {
     java = {
       signatureHelp = { enabled = true },
@@ -61,8 +61,8 @@ local config = {
       configuration = {
         runtimes = {
           {
-            name = "JavaSE-21",
-            path = "~/.sdkman/candidates/java/21.0.8-tem/",
+            name = "JavaSE-25",
+            path = "~/.sdkman/candidates/java/25-tem",
           },
         },
       },
@@ -121,32 +121,32 @@ local on_attach = function(client, bufnr)
           local message = diagnostic.message:lower()
           -- Filter out common style warnings
           return not (
-            message:find "indentation"
-            or message:find "whitespace"
-            or message:find "abbreviation"
-            or message:find "consecutive capital letters"
-            or message:find "incorrect indentation"
-            or message:find "empty blocks"
-            or message:find "method def"
+            message:find("indentation")
+            or message:find("whitespace")
+            or message:find("abbreviation")
+            or message:find("consecutive capital letters")
+            or message:find("incorrect indentation")
+            or message:find("empty blocks")
+            or message:find("method def")
           )
         end, result.diagnostics)
       end
       return original_handler(err, result, ctx, config)
     end
 
-    require("jdtls.dap").setup_dap { hotcodereplace = "auto" }
+    require("jdtls.dap").setup_dap({ hotcodereplace = "auto" })
     -- Delay main class config to avoid triggering nil errors
     vim.defer_fn(function()
       require("jdtls.dap").fetch_main_configs({}, function(mainclasses)
         if not mainclasses or vim.tbl_isempty(mainclasses) then
           vim.notify("[jdtls] No main classes found", vim.log.levels.WARN)
         else
-          require("jdtls.dap").setup_dap_main_class_configs {
+          require("jdtls.dap").setup_dap_main_class_configs({
             verbose = true,
             on_ready = function()
-              print "[jdtls] Main class configurations updated"
+              print("[jdtls] Main class configurations updated")
             end,
-          }
+          })
         end
       end)
     end, 7000) -- Wait 7 seconds to ensure project is loaded
@@ -154,6 +154,6 @@ local on_attach = function(client, bufnr)
 end
 config.on_attach = on_attach
 -- Only start jdtls if we're in a Java project
-if require("jdtls.setup").find_root { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" } then
+if require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" }) then
   require("jdtls").start_or_attach(config)
 end
