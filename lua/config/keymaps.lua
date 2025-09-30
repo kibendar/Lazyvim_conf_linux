@@ -6,6 +6,34 @@ local map = vim.keymap.set
 local dapui = require("dapui")
 dapui.setup() -- Make sure DAP UI is properly set up
 
+-- Diagnostics Toggle Function
+local M = {}
+local errors_only_mode = false
+
+M.toggle_diagnostics = function()
+  if errors_only_mode then
+    -- Currently showing errors only, show all
+    vim.diagnostic.config({
+      virtual_text = true,
+      signs = true,
+      underline = true,
+    })
+    errors_only_mode = false
+    print("Showing all diagnostics")
+  else
+    -- Show errors only
+    vim.diagnostic.config({
+      virtual_text = { severity = { min = vim.diagnostic.severity.ERROR } },
+      signs = { severity = { min = vim.diagnostic.severity.ERROR } },
+      underline = { severity = { min = vim.diagnostic.severity.ERROR } },
+    })
+    errors_only_mode = true
+    print("Showing errors only")
+  end
+end
+
+map("n", "<leader>td", M.toggle_diagnostics, { desc = "Toggle diagnostics level" })
+
 -- Spell checking keymaps
 map("n", "<leader>s", function()
   vim.opt.spell = not vim.opt.spell:get()
@@ -155,3 +183,41 @@ map("n", "<leader>lt", ":LanguageToolCheck<CR>")
 map("n", "<leader>ls", ":LanguageToolSummary<CR>")
 map("n", "<leader>lc", ":LanguageToolClear<CR>")
 map("n", "<leader>lh", ":help LanguageTool<CR>")
+
+-- LSP Core Functions (including code generation for missing methods)
+map("n", "<leader>ca", function()
+  vim.lsp.buf.code_action()
+end, { desc = "LSP Code Actions (Generate Missing Methods)" })
+map("n", "<leader>rn", function()
+  vim.lsp.buf.rename()
+end, { desc = "LSP Rename Symbol" })
+map("n", "<leader>gd", function()
+  vim.lsp.buf.definition()
+end, { desc = "LSP Go to Definition" })
+map("n", "<leader>gD", function()
+  vim.lsp.buf.declaration()
+end, { desc = "LSP Go to Declaration" })
+map("n", "<leader>gi", function()
+  vim.lsp.buf.implementation()
+end, { desc = "LSP Go to Implementation" })
+map("n", "<leader>gr", function()
+  vim.lsp.buf.references()
+end, { desc = "LSP Find References" })
+map("n", "<leader>K", function()
+  vim.lsp.buf.hover()
+end, { desc = "LSP Hover Documentation" })
+map("n", "<leader>k", function()
+  vim.lsp.buf.signature_help()
+end, { desc = "LSP Signature Help" })
+map("n", "<leader>D", function()
+  vim.lsp.buf.type_definition()
+end, { desc = "LSP Type Definition" })
+map("n", "<leader>wa", function()
+  vim.lsp.buf.add_workspace_folder()
+end, { desc = "LSP Add Workspace Folder" })
+map("n", "<leader>wr", function()
+  vim.lsp.buf.remove_workspace_folder()
+end, { desc = "LSP Remove Workspace Folder" })
+map("n", "<leader>wl", function()
+  print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+end, { desc = "LSP List Workspace Folders" })

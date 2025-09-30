@@ -3,6 +3,7 @@ local lspconfig = require("lspconfig")
 
 -- Updated ltex configuration with reduced verbosity
 lspconfig.ltex.setup({
+  capabilities = capabilities,
   -- Disable progress messages
   handlers = {
     ["$/progress"] = function() end, -- Completely disable progress messages for ltex
@@ -36,6 +37,7 @@ lspconfig.ltex.setup({
 
 -- Python Language Server
 lspconfig.pyright.setup({
+  capabilities = capabilities,
   settings = {
     python = {
       analysis = {
@@ -50,6 +52,7 @@ lspconfig.pyright.setup({
 
 -- TypeScript/JavaScript Language Server
 lspconfig.ts_ls.setup({
+  capabilities = capabilities,
   settings = {
     typescript = {
       inlayHints = {
@@ -78,15 +81,7 @@ lspconfig.ts_ls.setup({
 
 -- HTML Language Server
 lspconfig.html.setup({
-  capabilities = {
-    textDocument = {
-      completion = {
-        completionItem = {
-          snippetSupport = true,
-        },
-      },
-    },
-  },
+  capabilities = capabilities,
   settings = {
     html = {
       format = {
@@ -104,15 +99,7 @@ lspconfig.html.setup({
 
 -- CSS Language Server
 lspconfig.cssls.setup({
-  capabilities = {
-    textDocument = {
-      completion = {
-        completionItem = {
-          snippetSupport = true,
-        },
-      },
-    },
-  },
+  capabilities = capabilities,
   settings = {
     css = {
       validate = true,
@@ -135,12 +122,81 @@ lspconfig.cssls.setup({
   },
 })
 
--- AST-grep Language Server (C/C++)
-lspconfig.ast_grep.setup({
-  filetypes = { "c", "cpp", "h", "hpp" },
+-- C/C++ Language Server (clangd is recommended over ast-grep for LSP)
+lspconfig.clangd.setup({
+  capabilities = capabilities,
+  cmd = {
+    "clangd",
+    "--background-index",
+    "--clang-tidy",
+    "--header-insertion=iwyu",
+    "--completion-style=detailed",
+    "--function-arg-placeholders",
+    "--fallback-style=llvm",
+  },
+  init_options = {
+    usePlaceholders = true,
+    completeUnimported = true,
+    clangdFileStatus = true,
+  },
+})
+
+-- Rust Language Server
+lspconfig.rust_analyzer.setup({
+  capabilities = capabilities,
   settings = {
-    astGrep = {
-      -- Add your ast-grep specific settings here
+    ["rust-analyzer"] = {
+      cargo = {
+        allFeatures = true,
+        loadOutDirsFromCheck = true,
+        runBuildScripts = true,
+      },
+      checkOnSave = {
+        allFeatures = true,
+        command = "clippy",
+        extraArgs = { "--no-deps" },
+      },
+      procMacro = {
+        enable = true,
+        ignored = {
+          ["async-trait"] = { "async_trait" },
+          ["napi-derive"] = { "napi" },
+          ["async-recursion"] = { "async_recursion" },
+        },
+      },
     },
   },
+})
+
+-- Lua Language Server
+lspconfig.lua_ls.setup({
+  capabilities = capabilities,
+  settings = {
+    Lua = {
+      runtime = {
+        version = "LuaJIT",
+      },
+      diagnostics = {
+        globals = { "vim" },
+      },
+      workspace = {
+        library = vim.api.nvim_get_runtime_file("", true),
+        checkThirdParty = false,
+      },
+      telemetry = {
+        enable = false,
+      },
+    },
+  },
+})
+
+-- Bash Language Server
+lspconfig.bashls.setup({
+  capabilities = capabilities,
+  filetypes = { "sh", "bash" },
+})
+
+-- Kotlin Language Server
+lspconfig.kotlin_language_server.setup({
+  capabilities = capabilities,
 })

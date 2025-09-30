@@ -6,6 +6,11 @@ return {
       default = {
         dir_path = "images",
         file_name = "img-%Y-%m-%d-at-%H-%M-%S",
+        -- Disable default keymaps
+        keymaps = {
+          insert = {},
+          normal = {},
+        },
       },
       filetypes = {
         markdown = {
